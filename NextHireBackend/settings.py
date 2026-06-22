@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'CreateUser',
     'jobposting',
      "corsheaders",
+     "reportgeneration"
 ]
 
 AUTH_USER_MODEL = "CreateUser.User"
