@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from CreateUser.views import reg_candidate,reg_recruiter
-from jobposting.views import CreateJob,ListAlljob,ApplyJob
+from jobposting.views import CreateJob,ListAlljob,ApplyJob,JobDetail
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -30,5 +30,6 @@ urlpatterns = [
     path("createcandiate/",reg_candidate.as_view(),name="Register_Candidate"),
     path("createrecruiter/",reg_recruiter.as_view(),name="Register_recruiter"),
     path("createjob/",CreateJob.as_view(),name="Create_job"),
-    path("listjob/",ListAlljob.as_view(),name="List_job")
+    path("listjob/",ListAlljob.as_view(),name="List_job"),
+    path("listjob/<int:pk>/", JobDetail.as_view(), name="job-detail"),
 ]

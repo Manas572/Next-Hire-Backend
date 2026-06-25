@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework.generics import CreateAPIView,ListAPIView
+from rest_framework.generics import CreateAPIView,ListAPIView,RetrieveAPIView
 from .models import Job
 from .serializers import JobSerializer,JobApplySerializer,Listing
 from django.shortcuts import get_object_or_404
@@ -25,4 +25,8 @@ class ApplyJob(CreateAPIView):
 
 class ListAlljob(ListAPIView):
     queryset=Job.objects.filter(is_active=True).order_by("-created_at")
+    serializer_class=Listing
+
+class JobDetail(RetrieveAPIView):
+    queryset=Job.objects.filter(is_active=True).select_related("recruiter")
     serializer_class=Listing

@@ -31,8 +31,8 @@ class JobApplySerializer(serializers.ModelSerializer):
         if job.is_active==False :
             raise serializers.ValidationError({"error":"This job is not active"})
         
-        if not candidate.resume_link  and not candidate.portfolio_url :
-            raise serializers.ValidationError({"error":"Atleast put 1 resume link or portfolio url to apply in you profile" })
+        if not candidate.resume_link   :
+            raise serializers.ValidationError({"error":"put resume link  to apply in you profile" })
         
         if Application.objects.filter(candidate=candidate,job=job).exists():
             raise serializers.ValidationError({"error":"You have applied already"})
@@ -40,9 +40,18 @@ class JobApplySerializer(serializers.ModelSerializer):
         return attrs
     
 class Listing(serializers.ModelSerializer):
+    company_name = serializers.CharField(
+        source="recruiter.company_name",
+        read_only=True
+    )
+    company_website = serializers.URLField(
+        source="recruiter.company_website",
+        read_only=True
+    )
+
     class Meta:
-        model=Job
-        fields=["id","title","location","salary","description"]
+        model = Job
+        fields = ["id","title","location","salary","description","created_at","company_name","company_website",]
         
 
 
