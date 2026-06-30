@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, CandidateProfile, RecruiterProfile
+from .models import User, CandidateProfile, RecruiterProfile,Education,Project,Skill,Experience
 
 
 @admin.register(User)
@@ -38,3 +38,7 @@ class RecruiterProfileAdmin(admin.ModelAdmin):
 
 admin.site.register(CandidateProfile, CandidateProfileAdmin)
 admin.site.register(RecruiterProfile, RecruiterProfileAdmin)
+admin.site.register(Skill)
+admin.site.register(Education)
+admin.site.register(Experience)
+admin.site.register(Project)

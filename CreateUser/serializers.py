@@ -2,7 +2,7 @@ from django.db import transaction
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from .models import (User,CandidateProfile,RecruiterProfile,)
+from .models import (User,CandidateProfile,RecruiterProfile,Education,Project,Experience)
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -125,9 +125,44 @@ class RecruiterRegistrationSerializer(serializers.ModelSerializer):
             role=User.Role.RECRUITER,
         )
 
-        recruiter = RecruiterProfile.objects.create(
-            user=user,
-            **validated_data,
-        )
+        recruiter = RecruiterProfile.objects.create(user=user,**validated_data,)
 
         return recruiter
+    
+class EducationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Education
+        exclude=["candidate"]
+    def validate(self, attrs):
+        end_date=attrs.get("end_date")
+        start_date=attrs.get("start_date")
+        if end_date and start_date>end_date:
+            raise serializers.ValidationError({"error":"end date is invalid"})
+        
+        return attrs
+
+
+  
+class ProjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Project
+        exclude=["candidate"]
+
+class ExperienceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Experience
+        exclude=["candidate"]
+    def validate(self, attrs):
+        end_date=attrs.get("end_date")
+        start_date=attrs.get("start_date")
+        currently_working=attrs.get("currently_working")
+        if end_date and start_date and start_date>end_date:
+            raise serializers.ValidationError({"error":"end date is invalid"})
+        
+        if currently_working and end_date:
+            raise serializers.ValidationError({"error":"currently worling cannot have end date"})
+        return attrs
+
+
+
+
