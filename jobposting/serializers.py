@@ -22,17 +22,15 @@ class JobSerializer(serializers.ModelSerializer):
 class JobApplySerializer(serializers.ModelSerializer):
     class Meta:
         model=Application
-        fields=[]
+        fields=["resume_link","portfolio_url","linkedin_url","codolio_url","github_url"]
 
     def validate(self,attrs):
         candidate=self.context["request"].user.candidate_profile
         job = self.context["job"]
+        resume_link=attrs.get("resume_link")
         
         if job.is_active==False :
             raise serializers.ValidationError({"error":"This job is not active"})
-        
-        if not candidate.resume_link   :
-            raise serializers.ValidationError({"error":"put resume link  to apply in you profile" })
         
         if Application.objects.filter(candidate=candidate,job=job).exists():
             raise serializers.ValidationError({"error":"You have applied already"})

@@ -42,6 +42,12 @@ class Application(models.Model):
         ACCEPTED="ACCEPTED","Accepted"
         REJECTED="REJECTED","Rejected"
 
+    resume_link=models.URLField(max_length=200);
+    portfolio_url=models.URLField(max_length=150,blank=True)
+    linkedin_url=models.URLField(max_length=150,blank=True)
+    github_url=models.URLField(max_length=150,blank=True)
+    codolio_url=models.URLField(max_length=150,blank=True)
+
     statustype=models.CharField(max_length=10,choices=Status.choices,default=Status.PENDING)
     applied_at = models.DateTimeField(auto_now_add=True)
 
