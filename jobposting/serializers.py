@@ -22,7 +22,7 @@ class JobSerializer(serializers.ModelSerializer):
 class JobApplySerializer(serializers.ModelSerializer):
     class Meta:
         model=Application
-        fields=["resume_link","portfolio_url","linkedin_url","codolio_url","github_url"]
+        fields=["email","resume_link","portfolio_url","linkedin_url","codolio_url","github_url"]
 
     def validate(self,attrs):
         candidate=self.context["request"].user.candidate_profile

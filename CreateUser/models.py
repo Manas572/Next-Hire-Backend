@@ -104,7 +104,7 @@ class Experience(models.Model):
 
     def clean(self):
         if self.end_date and self.start_date > self.end_date:
-         raise ValidationError("End date cannot be before start date.")
+         raise ValidationError({"error":"End date cannot be before start date."})
 
         if self.currently_working and self.end_date:
          raise ValidationError({"error":"Current job should not have an end date"})
@@ -123,7 +123,7 @@ class Project(models.Model):
     )
     name = models.CharField(max_length=200)
     description = models.TextField()
-    tech_stack = models.ManyToManyField(Skill)
+    tech_stack = models.ManyToManyField(Skill,blank=True)
     github_link = models.URLField()
     deployed_link = models.URLField(blank=True)
     def __str__(self):

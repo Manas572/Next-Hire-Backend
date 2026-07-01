@@ -47,6 +47,7 @@ class Application(models.Model):
     linkedin_url=models.URLField(max_length=150,blank=True)
     github_url=models.URLField(max_length=150,blank=True)
     codolio_url=models.URLField(max_length=150,blank=True)
+    email=models.EmailField()
 
     statustype=models.CharField(max_length=10,choices=Status.choices,default=Status.PENDING)
     applied_at = models.DateTimeField(auto_now_add=True)

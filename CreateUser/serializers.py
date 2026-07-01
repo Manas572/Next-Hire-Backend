@@ -37,12 +37,7 @@ class CandidateRegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CandidateProfile
-        fields = [
-            "email",
-            "password",
-            "resume_link",
-            "portfolio_url",
-        ]
+        fields = ["email","password","resume_link","portfolio_url",]
 
     def validate_email(self, value):
         if User.objects.filter(email=value).exists():
@@ -163,6 +158,63 @@ class ExperienceSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"error":"currently worling cannot have end date"})
         return attrs
 
+class CandidateProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CandidateProfile
+        fields = ["profile_image","resume_link","portfolio_url","phone_number","linkedin_url","github_url","codolio_url","skills"]
 
 
+class EducationUpdSer(serializers.ModelSerializer):
+    class Meta:
+        model=Education
+        exclude=["candidate"]
 
+    def validate(self, attrs):
+        start_date=attrs.get('start_date',self.instance.start_date)
+        end_date=attrs.get('end_date',self.instance.end_date)
+        cgpa=attrs.get('cgpa',self.instance.cgpa)
+        if start_date and end_date and start_date>end_date:
+            raise serializers.ValidationError({"error":"start data and end date is not valid"})
+        if cgpa and cgpa<0:
+            raise serializers.ValidationError({"error":"invalid cgpa"})
+
+        return attrs
+    
+class ProjectUpdSer(serializers.ModelSerializer):
+    class Meta:
+        model=Project
+        exclude=["candidate"]
+
+class ExperienceUpdSer(serializers.ModelSerializer):
+    class Meta:
+        model=Experience
+        exclude=["candidate"]
+
+    def validate(self, attrs):
+        start_date=attrs.get('start_date',self.instance.start_date)
+        end_date=attrs.get('end_date',self.instance.end_date)
+        currently_working=attrs.get('currently_working',self.instance.currently_working)
+        if start_date and end_date and start_date>end_date:
+            raise serializers.ValidationError({"error":"start data and end date is not valid"})
+        if currently_working and end_date :
+            raise serializers.ValidationError({"error":"currently working job cannot have end date"})
+
+        return attrs
+    
+class ExperienceListSer(serializers.ModelSerializer):
+    class Meta:
+        model = Experience
+        exclude = ["candidate"]
+
+
+class EducationListSer(serializers.ModelSerializer):
+    class Meta:
+        model = Education
+        exclude = ["candidate"]
+
+
+class ProjectListSer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        exclude = ["candidate"]
+        
