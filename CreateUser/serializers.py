@@ -2,8 +2,7 @@ from django.db import transaction
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from .models import (User,CandidateProfile,RecruiterProfile,Education,Project,Experience)
-
+from .models import (User,CandidateProfile,RecruiterProfile,Education,Project,Experience,Skill)
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -131,8 +130,11 @@ class EducationSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         end_date=attrs.get("end_date")
         start_date=attrs.get("start_date")
-        if end_date and start_date>end_date:
+        cgpa=attrs.get("cgpa")
+        if start_date and end_date and start_date>end_date:
             raise serializers.ValidationError({"error":"end date is invalid"})
+        if cgpa and cgpa<0:
+            raise serializers.ValidationError({"error":"invalid cgpa"})
         
         return attrs
 
@@ -217,4 +219,9 @@ class ProjectListSer(serializers.ModelSerializer):
     class Meta:
         model = Project
         exclude = ["candidate"]
+
+class SkillSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Skill
+        fields = ["id", "name"]
         

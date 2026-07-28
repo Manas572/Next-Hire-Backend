@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.generics import CreateAPIView
-from .serializers import CandidateRegistrationSerializer,RecruiterRegistrationSerializer,EducationSerializer,ProjectSerializer,ExperienceSerializer,CandidateProfileSerializer,EducationUpdSer,ProjectUpdSer,ExperienceUpdSer,ProjectListSer,ExperienceListSer,EducationListSer
-from .models import CandidateProfile,RecruiterProfile,Education,Experience,Project
+from .serializers import CandidateRegistrationSerializer,RecruiterRegistrationSerializer,EducationSerializer,ProjectSerializer,ExperienceSerializer,CandidateProfileSerializer,EducationUpdSer,ProjectUpdSer,ExperienceUpdSer,ProjectListSer,ExperienceListSer,EducationListSer,SkillSerializer
+from .models import CandidateProfile,RecruiterProfile,Education,Experience,Project,Skill
 from rest_framework.generics import RetrieveUpdateAPIView,UpdateAPIView,ListAPIView
 # Create your views here.
 class reg_candidate(CreateAPIView):
@@ -16,9 +16,8 @@ class education_register(CreateAPIView):
     queryset=Education.objects.all()
     serializer_class=EducationSerializer
     def perform_create(self, serializer):
-        education = Education(candidate=self.request.user.candidate_profile,**serializer.validated_data)
-        education.full_clean()
-        education.save()
+        serializer.save(candidate=self.request.user.candidate_profile)
+       
 
 
 class project_register(CreateAPIView):
@@ -33,10 +32,7 @@ class experience_register(CreateAPIView):
     serializer_class=ExperienceSerializer
     
     def perform_create(self, serializer):
-        experience = Experience(candidate=self.request.user.candidate_profile,**serializer.validated_data)
-        experience.full_clean()
-        experience.save()
-    
+        serializer.save(candidate=self.request.user.candidate_profile)
 
 class CandidateProfileView(RetrieveUpdateAPIView):
     serializer_class = CandidateProfileSerializer
@@ -62,18 +58,27 @@ class ExperienceUpd(UpdateAPIView):
 
 class ExperienceListView(ListAPIView):
     serializer_class = ExperienceSerializer
+    pagination_class=None
     def get_queryset(self):
         return self.request.user.candidate_profile.experiences.all()
 
 
 class EducationListView(ListAPIView):
     serializer_class = EducationSerializer
+    pagination_class=None
     def get_queryset(self):
         return self.request.user.candidate_profile.educations.all()
 
 
 class ProjectListView(ListAPIView):
     serializer_class = ProjectSerializer
+    pagination_class=None
     def get_queryset(self):
         return self.request.user.candidate_profile.projects.all()
+    
+class skilllist(ListAPIView):
+    queryset=Skill.objects.all()
+    serializer_class=SkillSerializer
+    pagination_class=None
+
     
