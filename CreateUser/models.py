@@ -92,7 +92,6 @@ class Experience(models.Model):
         INTERN="INTERN","INTERN"
         PART_TIME="PART_TIME","PART_TIME"
         CONTRACT="CONTRACT","CONTRACT"
-
     company = models.CharField(max_length=200)
     designation = models.CharField(max_length=200)
     employment_type=models.CharField(max_length=15,choices=EmploymentType.choices)
@@ -105,10 +104,8 @@ class Experience(models.Model):
     def clean(self):
         if self.end_date and self.start_date > self.end_date:
          raise ValidationError({"error":"End date cannot be before start date."})
-
         if self.currently_working and self.end_date:
          raise ValidationError({"error":"Current job should not have an end date"})
-
     def __str__(self):
         return f"{self.designation} at {self.company}"
     

@@ -32,8 +32,6 @@ SECRET_KEY = 'django-insecure-!js=8xt3n)o++2er23*w9v#!jt(8c6(_!8m8wfjk(4ex^=$ehr
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -51,7 +49,9 @@ INSTALLED_APPS = [
      "corsheaders",
      "reportgeneration",
      "resume",
-
+     "interview",
+     "ninja",
+     "cf",
 ]
 
 AUTH_USER_MODEL = "CreateUser.User"
@@ -154,7 +154,38 @@ STATIC_URL = 'static/'
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://35hzb7z7-5173.inc1.devtunnels.ms",
 ]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://35hzb7z7-5173.inc1.devtunnels.ms",
+]
+
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '35hzb7z7-5173.inc1.devtunnels.ms',
+]
+
+
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": os.environ.get("REDIS_URL", "redis://127.0.0.1:6379/1"),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "IGNORE_EXCEPTIONS": True, 
+            "SOCKET_CONNECT_TIMEOUT": 5,
+            "SOCKET_TIMEOUT": 5,
+        },
+    }
+}
+
+SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
+SESSION_CACHE_ALIAS = "default"
+
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=25),

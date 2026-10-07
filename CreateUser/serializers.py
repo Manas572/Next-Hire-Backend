@@ -8,31 +8,22 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-
         token["email"] = user.email
         token["role"] = user.role
         token["is_staff"] = user.is_staff
-
         return token
 
     def validate(self, attrs):
         data = super().validate(attrs)
 
-        data["user"] = {
-            "email": self.user.email,
-            "role": self.user.role,
-            "is_staff": self.user.is_staff,
-        }
+        data["user"] = {"email": self.user.email,"role": self.user.role,"is_staff": self.user.is_staff,}
 
         return data
 
 
 class CandidateRegistrationSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(write_only=True)
-    password = serializers.CharField(
-        write_only=True,
-        validators=[validate_password],
-    )
+    password = serializers.CharField(write_only=True,validators=[validate_password],)
 
     class Meta:
         model = CandidateProfile
@@ -40,26 +31,15 @@ class CandidateRegistrationSerializer(serializers.ModelSerializer):
 
     def validate_email(self, value):
         if User.objects.filter(email=value).exists():
-            raise serializers.ValidationError(
-                {"error": "Email already registered."}
-            )
+            raise serializers.ValidationError({"error": "Email already registered."})
         return value
 
     @transaction.atomic
     def create(self, validated_data):
         email = validated_data.pop("email")
         password = validated_data.pop("password")
-
-        user = User.objects.create_user(
-            email=email,
-            password=password,
-            role=User.Role.CANDIDATE,
-        )
-
-        candidate = CandidateProfile.objects.create(
-            user=user,
-            **validated_data,
-        )
+        user = User.objects.create_user(email=email,password=password,role=User.Role.CANDIDATE,)
+        candidate = CandidateProfile.objects.create(user=user,**validated_data,)
 
         return candidate
 
