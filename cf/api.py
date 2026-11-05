@@ -27,6 +27,9 @@ class VerifyOut(Schema):
     verified: bool
     message: str
 
+class Correctsub(Schema):
+    messge:str
+
 @api.get("/perinfo", response={200: ResOut, 404: ErrorOut})
 def profile(request, userinfo: str):
     url = "https://codeforces.com/api/user.info"
@@ -124,3 +127,30 @@ def verifyuser(request, userinfo: str, payload: VerifyIn):
         return 400, {"message": f"Expected verdict COMPILATION_ERROR"}
 
     return 200, {"verified": True, "message": "Handle successfully verified via compilation error"}
+
+
+@api.post("/verifysub", response={200: Correctsub, 400: ErrorOut, 404: ErrorOut})
+def verifysub(request, userinfo: str, payload: VerifyIn):
+    url = "https://codeforces.com/api/user.status"
+    res = requests.get(url, params={"handle": userinfo, "count": 5}, timeout=10)
+    resdata = res.json()
+    if resdata.get("status") != "OK":
+        return 404, {"message": "Could not fetch user submission history"}
+    listq = resdata.get("result", [])
+    if not listq:
+        return 400, {"message": "No submissions found for this user"}
+
+    latest = listq[0]
+    problem = latest.get("problem", {})
+    verdict = latest.get("verdict")
+    same_problem = (
+        problem.get("contestId") == payload.contestId
+        and problem.get("index") == payload.index
+    )
+    if not same_problem:
+        return 400, {"message": "Q is not same"}
+
+    if verdict != "OK":
+        return 400, {"message": "Q is not solved"}
+
+    return 200, {"message": "Handle successfully verified via compilation error"}

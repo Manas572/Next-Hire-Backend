@@ -132,7 +132,7 @@ USE_TZ = True
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'CreateUser.cookie_auth.CookieJWTAuthentication',
     ),
     "DEFAULT_THROTTLE_CLASSES": [
         "rest_framework.throttling.UserRateThrottle",
@@ -158,7 +158,12 @@ CORS_ALLOWED_ORIGINS = [
     "https://35hzb7z7-5173.inc1.devtunnels.ms",
 ]
 
+# Required so the browser sends cookies with cross-origin requests
+CORS_ALLOW_CREDENTIALS = True
+
 CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
     "https://35hzb7z7-5173.inc1.devtunnels.ms",
 ]
 

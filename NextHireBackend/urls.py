@@ -3,9 +3,10 @@ from django.urls import path
 from CreateUser.views import reg_candidate,reg_recruiter,education_register,project_register,experience_register,CandidateProfileView,EducationListView,ExperienceListView,ProjectListView,ProjectUpd,ExperienceUpd,EducationUpd,skilllist
 from jobposting.views import CreateJob,ListAlljob,ApplyJob,JobDetail
 from resume.views import resume_register
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
+from CreateUser.cookie_views import (
+    CookieTokenObtainPairView,
+    CookieTokenRefreshView,
+    LogoutView,
 )
 from ninja import NinjaAPI
 from interview.api import interview_router
@@ -19,8 +20,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("api/", api.urls),
     path("api/cf/", cf_api.urls),
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/token/', CookieTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', CookieTokenRefreshView.as_view(), name='token_refresh'),
+    path('api/logout/', LogoutView.as_view(), name='logout'),
     path("createcandiate/",reg_candidate.as_view(),name="Register_Candidate"),
     path("me/",CandidateProfileView.as_view(),name="Candidate_profile"),
     path("edu/",EducationListView.as_view(),name="education_info"),
