@@ -28,7 +28,7 @@ class VerifyOut(Schema):
     message: str
 
 class Correctsub(Schema):
-    messge:str
+    message: str  # Fixed typo from 'messge'
 
 @api.get("/perinfo", response={200: ResOut, 404: ErrorOut})
 def profile(request, userinfo: str):
@@ -46,7 +46,7 @@ def profile(request, userinfo: str):
 CF_CACHE_KEY = "cf_filtered_problems"
 CACHE_TIMEOUT = 60 * 60 * 24
 
-def get_cached_or_fetch_allq():
+def get_questions():
     cached_res = cache.get(CF_CACHE_KEY)
     if cached_res is not None:
         return cached_res
@@ -66,7 +66,7 @@ def get_cached_or_fetch_allq():
 
 @api.get("/allq")
 def qfetching(request):
-    return get_cached_or_fetch_allq()
+    return get_questions()
 
 @api.get("/submissionhistory")
 def subfetching(request, userinfo: str):
@@ -80,7 +80,7 @@ def subfetching(request, userinfo: str):
         for q in resdata.get("result", [])
         if q.get("verdict") == "OK" and "problem" in q
     }
-    all_problems = get_cached_or_fetch_allq()
+    all_problems = get_questions()
     finres = {"1000": [], "1400": [], "1700": []}
     for rating in ["1000", "1400", "1700"]:
         pool = all_problems.get(rating, [])
@@ -98,14 +98,14 @@ def subfetching(request, userinfo: str):
 
 @api.get("/genverq")
 def verq(request):
-    problems = get_cached_or_fetch_allq().get("900", [])
+    problems = get_questions().get("900", [])
     return {"900": random.choice(problems) if problems else None}
 
 
 @api.post("/verifyce", response={200: VerifyOut, 400: ErrorOut, 404: ErrorOut})
 def verifyuser(request, userinfo: str, payload: VerifyIn):
     url = "https://codeforces.com/api/user.status"
-    res = requests.get(url, params={"handle": userinfo, "count": 5}, timeout=10)
+    res = requests.get(url, params={"handle": userinfo, "from": 1, "count": 1}, timeout=10)
     resdata = res.json()
     if resdata.get("status") != "OK":
         return 404, {"message": "Could not fetch user submission history"}
@@ -124,7 +124,7 @@ def verifyuser(request, userinfo: str, payload: VerifyIn):
         return 400, {"message": "Do compilation error at correct q"}
 
     if verdict != "COMPILATION_ERROR":
-        return 400, {"message": f"Expected verdict COMPILATION_ERROR"}
+        return 400, {"message": "Expected verdict COMPILATION_ERROR"}
 
     return 200, {"verified": True, "message": "Handle successfully verified via compilation error"}
 
@@ -132,7 +132,7 @@ def verifyuser(request, userinfo: str, payload: VerifyIn):
 @api.post("/verifysub", response={200: Correctsub, 400: ErrorOut, 404: ErrorOut})
 def verifysub(request, userinfo: str, payload: VerifyIn):
     url = "https://codeforces.com/api/user.status"
-    res = requests.get(url, params={"handle": userinfo, "count": 5}, timeout=10)
+    res = requests.get(url, params={"handle": userinfo, "from": 1, "count": 1}, timeout=10)
     resdata = res.json()
     if resdata.get("status") != "OK":
         return 404, {"message": "Could not fetch user submission history"}
@@ -152,5 +152,4 @@ def verifysub(request, userinfo: str, payload: VerifyIn):
 
     if verdict != "OK":
         return 400, {"message": "Q is not solved"}
-
-    return 200, {"message": "Handle successfully verified via compilation error"}
+    return 200, {"message": "Problem successfully solved and verified"}

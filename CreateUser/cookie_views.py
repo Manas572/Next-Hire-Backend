@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.tokens import RefreshToken
+from .serializers import MyTokenObtainPairSerializer
 
 
 def _set_auth_cookies(response: Response, access: str, refresh: str) -> None:
@@ -38,6 +39,8 @@ def _set_auth_cookies(response: Response, access: str, refresh: str) -> None:
 
 
 class CookieTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
+
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
 
