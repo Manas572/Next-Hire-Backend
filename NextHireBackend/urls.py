@@ -12,8 +12,9 @@ from ninja import NinjaAPI
 from interview.api import interview_router
 from interview.views import  get_question
 from cf.api import api as cf_api
+from CreateUser.permissions import candidate_cookie_auth
 
-api = NinjaAPI()
+api = NinjaAPI(auth=candidate_cookie_auth)
 api.add_router("", interview_router)
 
 urlpatterns = [

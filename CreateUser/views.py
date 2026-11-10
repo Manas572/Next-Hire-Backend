@@ -3,12 +3,15 @@ from rest_framework.generics import CreateAPIView
 from .serializers import CandidateRegistrationSerializer,RecruiterRegistrationSerializer,EducationSerializer,ProjectSerializer,ExperienceSerializer,CandidateProfileSerializer,EducationUpdSer,ProjectUpdSer,ExperienceUpdSer,ProjectListSer,ExperienceListSer,EducationListSer,SkillSerializer
 from .models import CandidateProfile,RecruiterProfile,Education,Experience,Project,Skill
 from rest_framework.generics import RetrieveUpdateAPIView,UpdateAPIView,ListAPIView
+from rest_framework.permissions import AllowAny
 # Create your views here.
 class reg_candidate(CreateAPIView):
+    permission_classes = [AllowAny]
     serializer_class=CandidateRegistrationSerializer
     queryset=CandidateProfile.objects.all()
 
 class reg_recruiter(CreateAPIView):
+    permission_classes = [AllowAny]
     serializer_class=RecruiterRegistrationSerializer
     queryset=RecruiterProfile.objects.all()
 

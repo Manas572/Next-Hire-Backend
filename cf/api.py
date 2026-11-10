@@ -2,8 +2,9 @@ import random
 import requests
 from django.core.cache import cache
 from ninja import FilterSchema, NinjaAPI, Schema
+from CreateUser.permissions import candidate_cookie_auth
 
-api = NinjaAPI()
+api = NinjaAPI(auth=candidate_cookie_auth)
 
 
 class ResOut(Schema):

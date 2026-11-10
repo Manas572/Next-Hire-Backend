@@ -131,17 +131,20 @@ USE_I18N = True
 USE_TZ = True
 
 REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": (
+        "CreateUser.permissions.IsAuthenticatedCandidate",
+    ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'CreateUser.cookie_auth.CookieJWTAuthentication',
     ),
     "DEFAULT_THROTTLE_CLASSES": [
-        "rest_framework.throttling.UserRateThrottle",
         "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
     ],
 
     "DEFAULT_THROTTLE_RATES": {
-        "user": "1000/day",
-        "anon": "300/day",
+        "anon": "10/hour",
+        "user": "100/hour",
     },
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 5,
