@@ -7,7 +7,6 @@ class Job(models.Model):
         on_delete=models.CASCADE,
         related_name="jobs"
     )
-
     title = models.CharField(max_length=255, db_index=True)
     description = models.TextField()
     location = models.CharField(max_length=255, db_index=True)

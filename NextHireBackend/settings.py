@@ -52,6 +52,7 @@ INSTALLED_APPS = [
      "interview",
      "ninja",
      "cf",
+     "recruiter",
 ]
 
 AUTH_USER_MODEL = "CreateUser.User"

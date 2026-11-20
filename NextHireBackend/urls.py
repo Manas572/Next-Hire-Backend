@@ -3,17 +3,13 @@ from django.urls import path
 from CreateUser.views import reg_candidate,reg_recruiter,education_register,project_register,experience_register,CandidateProfileView,EducationListView,ExperienceListView,ProjectListView,ProjectUpd,ExperienceUpd,EducationUpd,skilllist
 from jobposting.views import CreateJob,ListAlljob,ApplyJob,JobDetail
 from resume.views import resume_register
-from CreateUser.cookie_views import (
-    CookieTokenObtainPairView,
-    CookieTokenRefreshView,
-    LogoutView,
-)
+from CreateUser.cookie_views import (CookieTokenObtainPairView,CookieTokenRefreshView,LogoutView,)
 from ninja import NinjaAPI
 from interview.api import interview_router
 from interview.views import  get_question
 from cf.api import api as cf_api
 from CreateUser.permissions import candidate_cookie_auth
-
+from recruiter.views import job_count,app_count
 api = NinjaAPI(auth=candidate_cookie_auth)
 api.add_router("", interview_router)
 
@@ -42,5 +38,7 @@ urlpatterns = [
     path("listjob/<int:pk>/", JobDetail.as_view(), name="job-detail"),
     path("apply/<int:pk>/", ApplyJob.as_view(), name="apply-detail"),
     path("skills/",skilllist.as_view(),name="skill_set"),
-    path("interviewquestion/",get_question,name="interview_question")
+    path("interviewquestion/",get_question,name="interview_question"),
+    path('jobcount/<int:recruiter_id>/',job_count,name='job_count'),
+    path('applicationcount/<int:recruiter_id>/',app_count,name='application_count'),
 ]

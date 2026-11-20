@@ -3,15 +3,11 @@ from ninja.errors import HttpError
 from rest_framework.permissions import BasePermission
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import AccessToken
-
 from .models import User
 
 
 class IsAuthenticatedCandidate(BasePermission):
-    """Allow only authenticated candidate accounts to use protected APIs."""
-
     message = "A logged-in candidate account is required."
-
     def has_permission(self, request, view):
         user = request.user
         return bool(
@@ -20,9 +16,18 @@ class IsAuthenticatedCandidate(BasePermission):
             and getattr(user, "role", None) == User.Role.CANDIDATE
         )
 
+class IsAuthenticatedRecruitter(BasePermission):
+    message = "A logged-in Recruitter account is required."
+    def has_permission(self, request, view):
+        user = request.user
+        return bool(
+            user
+            and user.is_authenticated
+            and getattr(user, "role", None) == User.Role.RECRUITER
+        )
+
 
 def candidate_cookie_auth(request):
-    """Ninja API auth using the same HttpOnly access cookie as DRF."""
     raw_token = request.COOKIES.get("access_token")
     if not raw_token:
         ip = request.META.get("REMOTE_ADDR", "unknown")
