@@ -161,6 +161,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "https://35hzb7z7-5173.inc1.devtunnels.ms",
+    "https://job-sphere-delta.vercel.app",
 ]
 
 # Required so the browser sends cookies with cross-origin requests
@@ -171,6 +172,7 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:5173",
     "https://35hzb7z7-5173.inc1.devtunnels.ms",
     "https://next-hire-backend-oaeq.onrender.com",
+    "https://job-sphere-delta.vercel.app",
 ]
 
 ALLOWED_HOSTS = [
