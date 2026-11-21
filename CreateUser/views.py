@@ -4,7 +4,15 @@ from .serializers import CandidateRegistrationSerializer,RecruiterRegistrationSe
 from .models import CandidateProfile,RecruiterProfile,Education,Experience,Project,Skill
 from rest_framework.generics import RetrieveUpdateAPIView,UpdateAPIView,ListAPIView
 from rest_framework.permissions import AllowAny
-# Create your views here.
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def hello(request):
+    return Response({"status": "hello i am alive"}, status=200)
+
 class reg_candidate(CreateAPIView):
     permission_classes = [AllowAny]
     serializer_class=CandidateRegistrationSerializer
