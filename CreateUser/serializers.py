@@ -1,8 +1,20 @@
 from django.db import transaction
 from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import (User,CandidateProfile,RecruiterProfile,Education,Project,Experience,Skill)
+
+
+def validate_registration_password(value, email):
+    """Run configured password checks with the submitted email for similarity checks."""
+    user = User(email=email) if email else None
+    try:
+        validate_password(value, user=user)
+    except DjangoValidationError as error:
+        raise serializers.ValidationError(error.messages) from error
+    return value
+
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -16,14 +28,24 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         data = super().validate(attrs)
 
-        data["user"] = {"email": self.user.email,"role": self.user.role,"is_staff": self.user.is_staff,}
+        user_data = {"id": self.user.id, "email": self.user.email, "role": self.user.role, "is_staff": self.user.is_staff}
+        if self.user.role == User.Role.RECRUITER:
+            profile = getattr(self.user, "recruiter_profile", None)
+            if profile:
+                user_data.update({
+                    "recruiter_id": profile.id,
+                    "company_name": profile.company_name,
+                    "company_website": profile.company_website,
+                    "is_verified": profile.is_verified,
+                })
+        data["user"] = user_data
 
         return data
 
 
 class CandidateRegistrationSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(write_only=True)
-    password = serializers.CharField(write_only=True,validators=[validate_password],)
+    password = serializers.CharField(write_only=True)
 
     class Meta:
         model = CandidateProfile
@@ -33,6 +55,9 @@ class CandidateRegistrationSerializer(serializers.ModelSerializer):
         if User.objects.filter(email=value).exists():
             raise serializers.ValidationError({"error": "Email already registered."})
         return value
+
+    def validate_password(self, value):
+        return validate_registration_password(value, self.initial_data.get("email"))
 
     @transaction.atomic
     def create(self, validated_data):
@@ -49,7 +74,6 @@ class RecruiterRegistrationSerializer(serializers.ModelSerializer):
 
     password = serializers.CharField(
         write_only=True,
-        validators=[validate_password],
     )
 
     class Meta:
@@ -68,6 +92,9 @@ class RecruiterRegistrationSerializer(serializers.ModelSerializer):
                 {"error": "Email already registered."}
             )
         return value
+
+    def validate_password(self, value):
+        return validate_registration_password(value, self.initial_data.get("email"))
 
     def validate(self, attrs):
         company_name = attrs.get("company_name")

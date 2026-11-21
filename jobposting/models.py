@@ -16,13 +16,7 @@ class Job(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        constraints = [
-        UniqueConstraint(
-            fields=["recruiter", "title"],
-            condition=Q(is_active=True),
-            name="unique_job"
-        )
-    ]
+        constraints = [UniqueConstraint(fields=["recruiter", "title"],condition=Q(is_active=True),name="unique_job")]
 
 
 class Application(models.Model):

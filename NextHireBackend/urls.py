@@ -9,7 +9,7 @@ from interview.api import interview_router
 from interview.views import  get_question
 from cf.api import api as cf_api
 from CreateUser.permissions import candidate_cookie_auth
-from recruiter.views import job_count,app_count
+from recruiter.views import job_count,app_count,recruiter_applications,application_details
 api = NinjaAPI(auth=candidate_cookie_auth)
 api.add_router("", interview_router)
 
@@ -41,4 +41,6 @@ urlpatterns = [
     path("interviewquestion/",get_question,name="interview_question"),
     path('jobcount/<int:recruiter_id>/',job_count,name='job_count'),
     path('applicationcount/<int:recruiter_id>/',app_count,name='application_count'),
+    path('applicationinfo/<int:recruiter_id>/',recruiter_applications,name='application_info'),
+    path('applicationdetails/<int:recruiter_id>/',application_details,name='application_details'),
 ]

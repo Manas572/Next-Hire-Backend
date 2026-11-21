@@ -3,8 +3,10 @@ from rest_framework.generics import CreateAPIView,ListAPIView,RetrieveAPIView
 from .models import Job
 from .serializers import JobSerializer,JobApplySerializer,Listing
 from django.shortcuts import get_object_or_404
+from CreateUser.permissions import IsAuthenticatedCandidate, IsVerifiedRecruiter
 # Create your views here.
 class CreateJob(CreateAPIView):
+    permission_classes = [IsVerifiedRecruiter]
     serializer_class = JobSerializer
     queryset = Job.objects.all()
 
@@ -12,6 +14,7 @@ class CreateJob(CreateAPIView):
         serializer.save(recruiter=self.request.user.recruiter_profile)
         
 class ApplyJob(CreateAPIView):
+    permission_classes = [IsAuthenticatedCandidate]
     serializer_class = JobApplySerializer
     def get_job(self):
         if not hasattr(self, "_job"):

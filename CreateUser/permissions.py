@@ -16,8 +16,8 @@ class IsAuthenticatedCandidate(BasePermission):
             and getattr(user, "role", None) == User.Role.CANDIDATE
         )
 
-class IsAuthenticatedRecruitter(BasePermission):
-    message = "A logged-in Recruitter account is required."
+class IsAuthenticatedRecruiter(BasePermission):
+    message = "A logged-in recruiter account is required."
     def has_permission(self, request, view):
         user = request.user
         return bool(
@@ -25,6 +25,22 @@ class IsAuthenticatedRecruitter(BasePermission):
             and user.is_authenticated
             and getattr(user, "role", None) == User.Role.RECRUITER
         )
+
+
+# Keep the old spelling available for any imports added during development.
+IsAuthenticatedRecruitter = IsAuthenticatedRecruiter
+
+
+class IsVerifiedRecruiter(IsAuthenticatedRecruiter):
+    message = "A verified recruiter account is required to post jobs."
+
+    def has_permission(self, request, view):
+        if not super().has_permission(request, view):
+            return False
+        try:
+            return request.user.recruiter_profile.is_verified
+        except Exception:
+            return False
 
 
 def candidate_cookie_auth(request):
