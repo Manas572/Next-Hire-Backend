@@ -43,5 +43,5 @@ urlpatterns = [
     path('applicationcount/<int:recruiter_id>/',app_count,name='application_count'),
     path('applicationinfo/<int:recruiter_id>/',recruiter_applications,name='application_info'),
     path('applicationdetails/<int:recruiter_id>/',application_details,name='application_details'),
-    path('health',hello,name='health')
+    path('health/',hello,name='health')
 ]
