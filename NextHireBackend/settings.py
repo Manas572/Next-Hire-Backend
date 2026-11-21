@@ -176,6 +176,8 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     '35hzb7z7-5173.inc1.devtunnels.ms',
+    "next-hire-backend-oaeq.onrender.com",
+    ".onrender.com",
 ]
 
 
