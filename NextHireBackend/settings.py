@@ -144,8 +144,8 @@ REST_FRAMEWORK = {
     ],
 
     "DEFAULT_THROTTLE_RATES": {
-        "anon": "10/hour",
-        "user": "100/hour",
+        "anon": "1000/hour",
+        "user": "3000/hour",
     },
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 5,
