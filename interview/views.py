@@ -2,6 +2,7 @@ from rest_framework.decorators import api_view
 from .models import InterviewQue
 from rest_framework.response import Response
 from rest_framework import status
+from django.db import OperationalError
 # Create your views here.
 
 @api_view(['POST'])
@@ -15,7 +16,13 @@ def get_question(request):
     if type(used) is not list:
         return Response({"error":"used questions is not list"},status=status.HTTP_400_BAD_REQUEST)
     
-    que=(InterviewQue.objects.filter(topic=topic, difficulty=difficulty).exclude(id__in=used).order_by("?").first())
+    try:
+        que=(InterviewQue.objects.filter(topic=topic, difficulty=difficulty).exclude(id__in=used).order_by("?").first())
+    except OperationalError:
+        return Response(
+            {"error": "Interview question database is unavailable. Check the backend database connection."},
+            status=status.HTTP_503_SERVICE_UNAVAILABLE,
+        )
     if que is None:
         return Response({"missing":"questions completed"},status=status.HTTP_404_NOT_FOUND)
     

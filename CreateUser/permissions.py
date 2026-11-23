@@ -43,16 +43,37 @@ class IsVerifiedRecruiter(IsAuthenticatedRecruiter):
             return False
 
 
+def _check_request_limit(key, limit, message):
+    timeout = 60 * 60
+    try:
+        if cache.add(key, 1, timeout=timeout):
+            return
+
+        count = cache.incr(key)
+        if count is None:
+            # Redis may be unavailable, or the key may expire between add()
+            # and incr(). Reinitialize the counter when the backend permits it.
+            cache.add(key, 1, timeout=timeout)
+            return
+    except Exception:
+        # CACHES uses django-redis with IGNORE_EXCEPTIONS=True. Keep auth
+        # endpoints available if Redis is unavailable; the limiter fails open.
+        return
+
+    if count > limit:
+        raise HttpError(429, message)
+
+
 def candidate_cookie_auth(request):
     raw_token = request.COOKIES.get("access_token")
     if not raw_token:
         ip = request.META.get("REMOTE_ADDR", "unknown")
         key = f"api-anon-throttle:{ip}"
-        if cache.add(key, 1, timeout=60 * 60):
-            return None
-        count = cache.incr(key)
-        if count > 10:
-            raise HttpError(429, "Anonymous request limit exceeded. Try again later.")
+        _check_request_limit(
+            key,
+            10,
+            "Anonymous request limit exceeded. Try again later.",
+        )
         return None
 
     try:
@@ -65,8 +86,9 @@ def candidate_cookie_auth(request):
         return None
 
     key = f"api-user-throttle:{user.pk}"
-    if cache.add(key, 1, timeout=60 * 60):
-        return user
-    if cache.incr(key) > 100:
-        raise HttpError(429, "Candidate request limit exceeded. Try again later.")
+    _check_request_limit(
+        key,
+        100,
+        "Candidate request limit exceeded. Try again later.",
+    )
     return user
