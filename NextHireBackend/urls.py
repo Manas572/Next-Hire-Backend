@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path
 from CreateUser.views import hello,reg_candidate,reg_recruiter,education_register,project_register,experience_register,CandidateProfileView,EducationListView,ExperienceListView,ProjectListView,ProjectUpd,ExperienceUpd,EducationUpd,skilllist
 from jobposting.views import CreateJob,ListAlljob,ApplyJob,JobDetail
-from resume.views import resume_register
+from resume.views import ResumeListCreateView,ResumeOwnerDetailView,PublicResumeView
 from CreateUser.cookie_views import (CookieTokenObtainPairView,CookieTokenRefreshView,LogoutView,)
 from ninja import NinjaAPI
 from interview.api import interview_router
@@ -33,7 +33,6 @@ urlpatterns = [
     path("experience/",experience_register.as_view(),name="experience_register"),
     path("project/",project_register.as_view(),name="project_register"),
     path("createjob/",CreateJob.as_view(),name="Create_job"),
-    path("createresume/",resume_register.as_view(),name="Create_resume"),
     path("listjob/",ListAlljob.as_view(),name="List_job"),
     path("listjob/<int:pk>/", JobDetail.as_view(), name="job-detail"),
     path("apply/<int:pk>/", ApplyJob.as_view(), name="apply-detail"),
@@ -43,5 +42,8 @@ urlpatterns = [
     path('applicationcount/<int:recruiter_id>/',app_count,name='application_count'),
     path('applicationinfo/<int:recruiter_id>/',recruiter_applications,name='application_info'),
     path('applicationdetails/<int:recruiter_id>/',application_details,name='application_details'),
-    path('health/',hello,name='health')
+    path('health/',hello,name='health'),
+    path("createresume/", ResumeListCreateView.as_view(), name="Create_resume"),
+    path("resume/<int:pk>/", ResumeOwnerDetailView.as_view(), name="resume-detail"),
+    path("public/resume/<slug:slug>/", PublicResumeView.as_view(), name="public-resume"),
 ]

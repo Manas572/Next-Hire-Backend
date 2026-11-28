@@ -1,23 +1,30 @@
 from rest_framework import serializers
 from .models import ResumeDetails
 
-# Reuse existing serializers from CreateUser — no duplication needed
 from CreateUser.serializers import (
     EducationSerializer,
     ExperienceSerializer,
     ProjectSerializer,
     SkillSerializer,
 )
-
-
 class ResumeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ResumeDetails
         exclude = ["candidate"]
+        read_only_fields = ["slug"]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        request = self.context.get("request")
+        if request and request.user.is_authenticated:
+            profile = request.user.candidate_profile
+            self.fields["included_experiences"].queryset = profile.experiences.all()
+            self.fields["included_projects"].queryset = profile.projects.all()
+            self.fields["included_educations"].queryset = profile.educations.all()
+            self.fields["included_skills"].queryset = profile.skills.all()
 
-# ── Lightweight personal info (safe fields only) ──────────────────────────────
 class _PersonalInfoSerializer(serializers.Serializer):
+    full_name = serializers.SerializerMethodField()
     email = serializers.SerializerMethodField()
     phone_number = serializers.CharField(source="candidate.phone_number", allow_null=True)
     linkedin_url = serializers.URLField(source="candidate.linkedin_url", allow_null=True)
@@ -25,22 +32,25 @@ class _PersonalInfoSerializer(serializers.Serializer):
     portfolio_url = serializers.URLField(source="candidate.portfolio_url", allow_null=True)
     profile_image = serializers.URLField(source="candidate.profile_image", allow_blank=True)
 
+    def get_full_name(self, obj):
+        return obj.candidate.user.get_full_name() or obj.candidate.user.username
+
     def get_email(self, obj):
         return obj.candidate.user.email
 
 
-# ── Full read-only serializer for the public live-link view ──────────────────
 class PublicResumeSerializer(serializers.ModelSerializer):
     personal_info = serializers.SerializerMethodField()
-    included_educations = EducationSerializer(many=True)
-    included_experiences = ExperienceSerializer(many=True)
-    included_projects = ProjectSerializer(many=True)
-    included_skills = SkillSerializer(many=True)
+    included_educations = EducationSerializer(many=True, read_only=True)
+    included_experiences = ExperienceSerializer(many=True, read_only=True)
+    included_projects = ProjectSerializer(many=True, read_only=True)
+    included_skills = SkillSerializer(many=True, read_only=True)
 
     class Meta:
         model = ResumeDetails
         fields = [
             "id",
+            "slug",
             "title",
             "template",
             "accent_color",
@@ -57,8 +67,7 @@ class PublicResumeSerializer(serializers.ModelSerializer):
         return _PersonalInfoSerializer(obj).data
 
 
-# ── Lightweight list serializer for the dashboard ─────────────────────────────
 class ResumeListSerializer(serializers.ModelSerializer):
     class Meta:
         model = ResumeDetails
-        fields = ["id", "title", "template", "accent_color", "public"]
+        fields = ["id", "slug", "title", "template", "accent_color", "public"]
