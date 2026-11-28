@@ -5,7 +5,6 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .serializers import MyTokenObtainPairSerializer
@@ -54,10 +53,7 @@ class CookieTokenObtainPairView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
 
-        try:
-            serializer.is_valid(raise_exception=True)
-        except TokenError as e:
-            raise InvalidToken(e.args[0])
+        serializer.is_valid(raise_exception=True)
 
         tokens = serializer.validated_data
         access = tokens["access"]
@@ -86,10 +82,7 @@ class CookieTokenRefreshView(TokenRefreshView):
         data["refresh"] = refresh_token
         serializer = self.get_serializer(data=data)
 
-        try:
-            serializer.is_valid(raise_exception=True)
-        except TokenError as e:
-            raise InvalidToken(e.args[0])
+        serializer.is_valid(raise_exception=True)
 
         tokens = serializer.validated_data
         new_access = tokens["access"]

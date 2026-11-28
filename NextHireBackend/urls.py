@@ -10,7 +10,7 @@ from interview.views import  get_question
 from cf.api import api as cf_api
 from CreateUser.permissions import candidate_cookie_auth
 from recruiter.views import job_count,app_count,recruiter_applications,application_details
-api = NinjaAPI(auth=candidate_cookie_auth)
+api = NinjaAPI(auth=candidate_cookie_auth, urls_namespace="interview_api")
 api.add_router("", interview_router)
 
 urlpatterns = [
@@ -20,7 +20,8 @@ urlpatterns = [
     path('api/token/', CookieTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', CookieTokenRefreshView.as_view(), name='token_refresh'),
     path('api/logout/', LogoutView.as_view(), name='logout'),
-    path("createcandiadte/",reg_candidate.as_view(),name="Register_Candidate"),
+    path("createcandidate/", reg_candidate.as_view(), name="Register_Candidate"),
+    path("createcandiadte/", reg_candidate.as_view(), name="Register_Candidate_legacy"),
     path("me/",CandidateProfileView.as_view(),name="Candidate_profile"),
     path("edu/",EducationListView.as_view(),name="education_info"),
     path("exp/",ExperienceListView.as_view(),name="experience_info"),
